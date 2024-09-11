@@ -1,0 +1,32 @@
+# Auto generate and deploy documentation for your TypeScript projects on-demand. We can switch to auto trigger after each release if needed
+name: Generate Doc
+
+on:
+    workflow_dispatch:
+        inputs:
+            branch:
+                description: 'Branch to generate Doc for'
+                required: true
+                default: 'main' # Default to main branch
+
+jobs:
+    gen-doc:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Install dependencies
+              run: npm install # Or yarn install
+
+            - name: Generate TypeDoc
+              run: npm run typedoc # Or the command to run JSDoc
+
+            - name: Deploy to GitHub Pages
+              uses: peaceiris/actions-gh-pages@v3
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: ./docs # Or the directory specified in your typeDoc config
