@@ -74,6 +74,11 @@ npm run prettier:format | yarn prettier:format
 npm test | yarn test
 ```
 
+*Note: For developement build we can temporarily disable coverage requirement
+
+1. go to ./configs/jest.config.ts
+2. update coverageThreshold config to 0 
+
 ## Capabilities and Frameworks
 
 | Capability           | Module                                                                                                                                                                                                                                                                                                                                                                                                                                    |
