@@ -1,6 +1,6 @@
-# api-request
+# crypto-lib
 
-Let Myria's clients who is going to generate and verify L2 wallet signature to reuse our built-in base api service.
+Let Myria's clients who is going to use cryptographic functions such as generate/verify L2 wallet signature, etc. to reuse in our built-in services.
 
 ## Prerequisites
 
