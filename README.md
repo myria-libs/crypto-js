@@ -1,17 +1,6 @@
-# npm-template-typescript
+# crypto-lib
 
- Let developers who publish libraries via npm share with the team quickly 👍. Less time to set up utility tools to follow best practices in programming, and more time on the core features of the package 💪. Deliver our product to market faster 🚀
-
-## This package template supports us
-
-- [x] 1. **Customize configuration**: eslint, prettier, jest, typescript
-- [x] 2. **Git hook**: ensure your code is qualified with lint when committing and test when pushing from your early stage on your local machine
-- [x] 3. **CI jobs**: trigger on `each PR` or `Push event` to ensure jobs `Lint -> Build -> Test` are verified
-- [x] 4. **CD (publish) jobs**: trigger when a `new tag` is pushed
-    1. Create a new release with release notes based on your commit messages
-    2. Publish the npm package to npmjs like [@myria/airdrop-js](https://www.npmjs.com/package/@myria/airdrop-js)
-    3. Create | Update the Github page. DO not available for Github Free account on private repo
-- [x] 4. Generate API documentation for Typescript.
+Let Myria's clients who is going to use cryptographic functions such as generate/verify L2 wallet signature, etc. to reuse in our built-in services.
 
 ## Prerequisites
 
@@ -22,27 +11,20 @@ The following tools need to be installed:
 
 ## How to use
 
-### Clone and rename with your
+### Install
 
 ```bash
-git clone git@github.com:myria-libs/npm-template-typescript.git
-# rename to desire name folder
-mv npm-template-typescript $desire_name
-cd $desire_name
+# via npmjs
+npm i @myria/crypto-lib
+# via github on main branch
+npm i "https://github.com/myria-libs/crypto-lib.git#main"
 ```
 
-### Update necessary fields e.g. name, author, version, repository, etc in package.json file
+### Consume
 
-we can manage our package.json via [npm-pkg](https://docs.npmjs.com/cli/v10/commands/npm-pkg)
+Reference the implementation on [example/src/index.ts](example/src/index.ts)
 
-```bash
-npm pkg set <key>=<value> [<key>=<value> ...]
-npm pkg get [<key> [<key> ...]]
-npm pkg delete <key> [<key> ...]
-npm pkg set [<array>[<index>].<key>=<value> ...]
-npm pkg set [<array>[].<key>=<value> ...]
-npm pkg fix
-```
+## How to contribute
 
 ### Install dependencies and build it
 
@@ -53,6 +35,17 @@ git init
 npm install | yarn install
 # run build
 npm run build | yarn build
+```
+
+### Verify or fix lint
+
+```bash
+# check lint's rules
+npm run lint | yarn lint
+# check lint's rules and try to fix
+npm run lint:fix | yarn lint:fix
+# format your code
+npm run prettier:format | yarn prettier:format
 ```
 
 ### Implement your production code, write unit tests
