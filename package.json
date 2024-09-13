@@ -1,7 +1,7 @@
 {
   "name": "@myria/crypto-lib",
-  "version": "0.0.1",
-  "description": "Myria's Typescript template to build and publish an npm package",
+  "version": "0.0.1-alpha",
+  "description": "Myria's Crypto Library for common cryptographic functions",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -27,7 +27,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/myria-libs/npm-template-typescript.git"
+    "url": "git+https://github.com/myria-libs/crypto-lib.git"
   },
   "keywords": [
     "myria",
@@ -38,9 +38,9 @@
   "author": "@myria",
   "license": "UNLICENSED",
   "bugs": {
-    "url": "https://github.com/myria-libs/npm-template-typescript/issues"
+    "url": "https://github.com/myria-libs/crypto-lib/issues"
   },
-  "homepage": "https://github.com/myria-libs/npm-template-typescript#readme",
+  "homepage": "https://github.com/myria-libs/crypto-libt#readme",
   "devDependencies": {
     "@types/jest": "^29.5.11",
     "@types/node": "^20.14.10",
