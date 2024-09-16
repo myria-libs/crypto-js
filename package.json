@@ -1,5 +1,5 @@
 {
-  "name": "@myria/crypto-lib",
+  "name": "@myria/crypto-js",
   "version": "0.0.1-alpha",
   "description": "Myria's Crypto Library for common cryptographic functions",
   "main": "dist/index.js",
@@ -27,20 +27,21 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/myria-libs/crypto-lib.git"
+    "url": "git+https://github.com/myria-libs/crypto-js.git"
   },
   "keywords": [
     "myria",
-    "template",
-    "npm-template",
-    "npm-typescript"
+    "cryptographic",
+    "crypto-js",
+    "crypto-typescript",
+    "signature"
   ],
   "author": "@myria",
   "license": "UNLICENSED",
   "bugs": {
-    "url": "https://github.com/myria-libs/crypto-lib/issues"
+    "url": "https://github.com/myria-libs/crypto-js/issues"
   },
-  "homepage": "https://github.com/myria-libs/crypto-libt#readme",
+  "homepage": "https://github.com/myria-libs/crypto-js#readme",
   "devDependencies": {
     "@types/jest": "^29.5.11",
     "@types/node": "^20.14.10",
