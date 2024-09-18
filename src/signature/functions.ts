@@ -60,9 +60,8 @@ export function isValidHeaderSignature(
     const isValid = isSignatureValid(signatureOptions, msgHash, starkKey);
     if (isValid) {
         if (expirationInSeconds) {
-            const timeStampDate = new Date(timestamp);
             const expiredDate = new Date(
-                timeStampDate.getTime() + expirationInSeconds * 1000,
+                parseInt(timestamp) + expirationInSeconds * 1000,
             );
             if (expiredDate <= new Date()) {
                 return false;
