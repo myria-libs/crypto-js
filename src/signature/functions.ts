@@ -1,85 +1,12 @@
 import BN from "bn.js";
 import * as encUtils from "enc-utils";
-import { ISignature } from "./types/signature.interface";
-
+import md5 from "md5";
 import * as starkwareCrypto from "@starkware-industries/starkware-crypto-utils";
-type SignatureOptions = {
-    r: BN;
-    s: BN;
-};
 
-export function serializeSignatureOptions(sig: SignatureOptions): string {
-    return encUtils.addHexPrefix(
-        encUtils.padLeft(sig.r.toString(16), 64) +
-            encUtils.padLeft(sig.s.toString(16), 64),
-    );
-}
+// Internal imports
+import { SignatureOptions, ISignature, ValidationResult } from "./types";
 
-export function generateHeaderMsgHash(timestamp: string): BN {
-    return starkwareCrypto.pedersen([timestamp, "header:"]);
-}
-
-export function generateHeaderSignatureFromTimestamp(
-    myriaPrivateStarkKey: string,
-    starkKey: string,
-    timestamp: number,
-): ISignature {
-    if (!myriaPrivateStarkKey) {
-        throw new Error("Myria Private Stark Key is required");
-    }
-    if (!starkKey) {
-        throw new Error("Myria stark key is required");
-    }
-    if (!timestamp) {
-        throw new Error("Timestampt with seconds is required");
-    }
-    const signer = starkwareCrypto.ec.keyFromPrivate(
-        myriaPrivateStarkKey,
-        "hex",
-    );
-    const msgHash = generateHeaderMsgHash(timestamp.toString());
-    const signature = <SignatureOptions>(
-        starkwareCrypto.sign(signer, msgHash.toString())
-    );
-
-    return {
-        "x-signature": serializeSignatureOptions(signature),
-        "x-timestamp": timestamp.toString(),
-        "stark-key": starkKey,
-    };
-}
-
-export function isValidHeaderSignature(
-    signature: string,
-    starkKey: string,
-    timestamp: string,
-    expirationInSeconds?: number,
-): boolean {
-    const msgHash = generateHeaderMsgHash(timestamp);
-    const signatureOptions = deserializeSignature(signature);
-    const isValid = isSignatureValid(signatureOptions, msgHash, starkKey);
-    if (isValid) {
-        if (expirationInSeconds) {
-            const expiredDate = new Date(
-                parseInt(timestamp) + expirationInSeconds * 1000,
-            );
-            if (expiredDate <= new Date()) {
-                return false;
-            }
-        }
-        return true;
-    }
-    return false;
-}
-
-function deserializeSignature(sig: string, size = 64): SignatureOptions {
-    sig = encUtils.removeHexPrefix(sig);
-    return {
-        r: new BN(sig.substring(0, size), "hex"),
-        s: new BN(sig.substring(size, size * 2), "hex"),
-    };
-}
-
+// Internal functions
 function isValid(
     publicKey: string,
     msgHash: BN,
@@ -139,4 +66,160 @@ function isSignatureValid(
     } catch (err) {
         return false;
     }
+}
+
+function generateHeaderMsgHash(
+    timestamp: number,
+    url?: string,
+    payloadSerialization?: string,
+): BN {
+    const rawMessageToHash = url ?? "" + payloadSerialization ?? "";
+    const pedersen = starkwareCrypto.pedersen;
+    return pedersen([
+        pedersen([timestamp.toString(), md5(rawMessageToHash)]),
+        "header:",
+    ]);
+}
+
+// Public functions to let client consume
+
+/**
+ * Serialize the SignatureOptions to string
+ *
+ * @param {SignatureOptions} sig - The signature output from signing.
+ *  @returns {string} The serialized result as string
+ */
+export function serializeSignatureOptions(sig: SignatureOptions): string {
+    return encUtils.addHexPrefix(
+        encUtils.padLeft(sig.r.toString(16), 64) +
+            encUtils.padLeft(sig.s.toString(16), 64),
+    );
+}
+
+/**
+ * Deserialize serialized signature from string to SignatureOptions object
+ *
+ * @param {string} sig - The serialized signature in string format.
+ *  @returns {SignatureOptions} The SignatureOptions object with r & s in BN format
+ */
+export function deserializeSignature(sig: string, size = 64): SignatureOptions {
+    sig = encUtils.removeHexPrefix(sig);
+    return {
+        r: new BN(sig.substring(0, size), "hex"),
+        s: new BN(sig.substring(size, size * 2), "hex"),
+    };
+}
+
+/**
+ * Client generates signature header for a request
+ *
+ * @param {string} myriaPrivateStarkKey - Myria Private Stark Key return when registering wallet
+ * @param {string} starkKey - Myria Public Stark Key return when registering wallet
+ * @param {number} timestamp - The timestamp use to sign from client in milliseconds format
+ * @param {string?} url - The optional url is gonna be invoke e.g. /api/v1/users/1
+ * @param {string?} payloadSerialization - The optional payloadSerialization is gonna be sent along with the request
+ * @param {boolean?} shouldLogMessageHash - Whether to log the messageHash when verifier regenerate from request's input
+ *  @returns {ISignature} The ISignature object to send in the request's header later on
+ * @example
+ * ```js
+ * import { Signature } from '@myria/crypto-js';
+ *
+ * const headerSignature = Signature.generateHeaderSignatureFromTimestamp(
+ *   myriaPrivateStarkKey,
+ *   starkKey,
+ *   timestamp,
+ *   url,
+ *   payloadSerialization
+ * );
+ * ```
+ */
+export function generateHeaderSignatureFromTimestamp(
+    myriaPrivateStarkKey: string,
+    starkKey: string,
+    timestamp: number,
+    url?: string,
+    payloadSerialization?: string,
+    shouldLogMessageHash = true,
+): ISignature {
+    if (!myriaPrivateStarkKey) {
+        throw new Error("Myria Private Stark Key is required");
+    }
+    if (!starkKey) {
+        throw new Error("Myria stark key is required");
+    }
+    if (!timestamp) {
+        throw new Error("Timestamp with seconds is required");
+    }
+    const signer = starkwareCrypto.ec.keyFromPrivate(
+        myriaPrivateStarkKey,
+        "hex",
+    );
+    const msgHash = generateHeaderMsgHash(timestamp, url, payloadSerialization);
+    if (shouldLogMessageHash) {
+        console.log(`[crypto-js] Client generates msgHash = ${msgHash}`);
+    }
+
+    const signature = <SignatureOptions>(
+        starkwareCrypto.sign(signer, msgHash.toString())
+    );
+
+    return {
+        "x-signature": serializeSignatureOptions(signature),
+        "x-timestamp": timestamp,
+        "stark-key": starkKey,
+    };
+}
+
+/**
+ * Verify Client's signature in request's header
+ *
+ * @param {string} signature - The serialized signature in string format
+ * @param {string} starkKey - Myria Public Stark Key return when registering wallet
+ * @param {number} timestamp - The timestamp use to sign from client in milliseconds format
+ * @param {number?} expirationInSeconds - The duration for a request to be considered expired
+ * @param {string?} url - The optional url is gonna be invoke e.g. /api/v1/users/1
+ * @param {string?} payloadSerialization - The optional payloadSerialization is gonna be sent along with the request
+ * @param {boolean?} shouldLogMessageHash - Whether to log the messageHash when verifier regenerate from request's input
+ *  @returns {ValidationResult} The ValidationResult whether VALID | INVALID | EXPIRED
+ * @example
+ * ```js
+ * import { Signature } from '@myria/crypto-js';
+ *
+ * const headerSignature = Signature.validateHeaderSignature(
+ *   signature,
+ *   starkKey,
+ *   timestamp,
+ *   expireInSeconds,
+ *   url,
+ *   payloadSerialization
+ * );
+ * ```
+ */
+export function validateHeaderSignature(
+    signature: string,
+    starkKey: string,
+    timestamp: number,
+    expirationInSeconds?: number,
+    url?: string,
+    payloadSerialization?: string,
+    shouldLogMessageHash = true,
+): ValidationResult {
+    const msgHash = generateHeaderMsgHash(timestamp, url, payloadSerialization);
+    if (shouldLogMessageHash) {
+        console.log(`[crypto-js] Verifier regenerates msgHash = ${msgHash}`);
+    }
+    const signatureOptions = deserializeSignature(signature);
+    const isValid = isSignatureValid(signatureOptions, msgHash, starkKey);
+    if (isValid) {
+        if (expirationInSeconds) {
+            const expiredDate = new Date(
+                timestamp + expirationInSeconds * 1000,
+            );
+            if (expiredDate <= new Date()) {
+                return ValidationResult.EXPIRED;
+            }
+        }
+        return ValidationResult.VALID;
+    }
+    return ValidationResult.INVALID;
 }
