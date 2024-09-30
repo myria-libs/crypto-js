@@ -14,15 +14,16 @@ The following tools need to be installed:
 ### Install
 
 ```bash
-# via npmjs
+# npm
 npm i @myria/crypto-js
-# via github on main branch
-npm i "https://github.com/myria-libs/crypto-js.git#main"
+# yarn
+yarn add @myria/crypto-js
 ```
 
 ### Consume the crypto-js package
 
-Reference the implementation in our [example/src/index.js](https://github.com/myria-libs/crypto-js/blob/main/example/src/index.js). Should be straightforward
+* Reference our [crypto-js doc](https://myria-libs.github.io/crypto-js/)
+* Reference the implementation in our [example/src/index.js](https://github.com/myria-libs/crypto-js/blob/main/example/src/index.js). Should be straightforward
 
 ## How to contribute
 
