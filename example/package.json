@@ -1,7 +1,7 @@
 {
     "name": "example",
-    "version": "1.1.0",
-    "description": "example use the npm package",
+    "version": "1.2.0",
+    "description": "example consume the crypto-js package",
     "main": "index.js",
     "scripts": {
         "test": "echo 'example testing a customized npm package on local'",
@@ -10,7 +10,7 @@
     "author": "Le Ngoc Duy",
     "license": "MIT",
     "dependencies": {
-        "@askbills/npm-template-typescript": "file:..",
+        "@myria/crypto-js": "file:..",
         "dotenv": "^16.4.5"
     },
     "type": "module"

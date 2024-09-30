@@ -1,1 +1,2 @@
-export declare function hello(name: string): string;
+import * as Signature from "./signature";
+export { Signature };

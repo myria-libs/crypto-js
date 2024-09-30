@@ -20,6 +20,10 @@ npm i @myria/crypto-js
 npm i "https://github.com/myria-libs/crypto-js.git#main"
 ```
 
+### Consume the crypto-js package
+
+Reference the implementation in our [example/src/index.js](https://github.com/myria-libs/crypto-js/blob/main/example/src/index.js). Should be straightforward
+
 ## How to contribute
 
 ### Install dependencies and build it
