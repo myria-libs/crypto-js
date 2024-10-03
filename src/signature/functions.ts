@@ -150,6 +150,11 @@ export function generateHeaderSignatureFromTimestamp(
     if (!timestamp) {
         throw new Error("Timestamp with seconds is required");
     }
+    if (new Date(timestamp) > new Date()) {
+        throw new Error(
+            "Invalid timestamp. Timestamp in the future is not allowed.",
+        );
+    }
     const signer = starkwareCrypto.ec.keyFromPrivate(
         myriaPrivateStarkKey,
         "hex",
