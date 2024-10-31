@@ -201,24 +201,34 @@ export function generateHeaderSignatureFromTimestamp(
  * ```
  */
 export function validateHeaderSignature(
-    signature: string,
-    starkKey: string,
-    timestamp: number,
+    signature: {
+        headerSignature: string;
+        starkKey: string;
+        timestamp: number;
+        url?: string;
+        payloadSerialization?: string;
+    },
     expirationInSeconds?: number,
-    url?: string,
-    payloadSerialization?: string,
     shouldLogMessageHash = true,
 ): ValidationResult {
-    const msgHash = generateHeaderMsgHash(timestamp, url, payloadSerialization);
+    const msgHash = generateHeaderMsgHash(
+        signature.timestamp,
+        signature.url,
+        signature.payloadSerialization,
+    );
     if (shouldLogMessageHash) {
         console.log(`[crypto-js] Verifier regenerates msgHash = ${msgHash}`);
     }
-    const signatureOptions = deserializeSignature(signature);
-    const isValid = isSignatureValid(signatureOptions, msgHash, starkKey);
+    const signatureOptions = deserializeSignature(signature.headerSignature);
+    const isValid = isSignatureValid(
+        signatureOptions,
+        msgHash,
+        signature.starkKey,
+    );
     if (isValid) {
         if (expirationInSeconds) {
             const expiredDate = new Date(
-                timestamp + expirationInSeconds * 1000,
+                signature.timestamp + expirationInSeconds * 1000,
             );
             if (expiredDate <= new Date()) {
                 return ValidationResult.EXPIRED;
