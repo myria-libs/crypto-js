@@ -13,14 +13,14 @@ function clientSignRequest(
 }
 
 function verifyClientRequest(
-    signature, 
-    starkKey, 
+    signature,
+    starkKey,
     timestamp,
     expireInSeconds = null,
-    url = null, 
-    payloadSerialization = null
+    url = null,
+    payloadSerialization = null,
 ) {
-    return Signature.validateHeaderSignature(signature, starkKey, timestamp, expireInSeconds, url, payloadSerialization)
+    return Signature.validateHeaderSignature({headerSignature: signature, starkKey, timestamp, url, payloadSerialization}, expireInSeconds)
 }
 
 function waitInSeconds(delay) {
